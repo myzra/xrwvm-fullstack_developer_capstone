@@ -8,7 +8,7 @@ import json
 from django.views.decorators.csrf import csrf_exempt
 from .models import CarMake, CarModel
 from .populate import initiate
-from .restapis import get_request, analyze_review_sentiments, post_review
+from .restapis import get_request, analyze_review_sentiments
 # from .populate import initiate
 
 
@@ -75,7 +75,7 @@ def registration(request):
         # Check if user already exists
         User.objects.get(username=username)
         username_exist = True
-    except Exception as err:
+    except Exception:
         # If not, simply log this is a new user
         logger.debug("{} is new user".format(username))
     # If it is a new user
@@ -92,7 +92,7 @@ def registration(request):
         login(request, user)
         data = {"userName": username, "status": "Authenticated"}
         return JsonResponse(data)
-    else :
+    else:
         data = {"userName": username, "error": "Already Registered"}
         return JsonResponse(data)
 
@@ -130,11 +130,12 @@ def get_dealer_details(request, dealer_id):
 
 
 def add_review(request):
-    if not request.user.is_anonymous == False:
+    if request.user.is_anonymous == True:
         data = json.loads(request.body)
+        print(data)
         try:
             return JsonResponse({"status": 200})
-        except Exception as err:
+        except Exception:
             return JsonResponse({
                 "status": 401,
                 "message": "Error in posting review"
